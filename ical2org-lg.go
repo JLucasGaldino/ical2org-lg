@@ -169,23 +169,21 @@ func process(a args) {
 					}
 				}
 				eventsSaved++
-				// print the event
-				// choose active or inactive timestamp
-				format := "* %s <%s>\n"
-				switch {
-				case a.inactive:
-					format = "* %s [%s]\n"
-				case a.active:
-					format = "* %s <%s>\n"
-				}
-
-				fmt.Fprintf(f, format, strings.Replace(event.GetSummary(), `\,`, ",", -1), event.GetStart().Format("2006-01-02 Mon 15:04"))
+				
+				// Create time range string for title
+				timeRange := fmt.Sprintf("%s-%s", 
+					event.GetStart().Format("15:04"), 
+					event.GetEnd().Format("15:04"))
+				
+				// Modified: Add EVNT keyword and time range to title, remove timestamp from headline
+				fmt.Fprintf(f, "* EVNT %s %s\n", timeRange, strings.Replace(event.GetSummary(), `\,`, ",", -1))
+				
 				// Scheduled, Deadline, or nothing depending upon switches
 				switch {
 				case a.dead:
-					fmt.Fprintf(f, "    DEADLINE: <%s-%s>\n", event.GetStart().Format("2006-01-02 Mon 15:04"), event.GetEnd().Format("15:04"))
+					fmt.Fprintf(f, "DEADLINE: <%s-%s>\n", event.GetStart().Format("2006-01-02 Mon 15:04"), event.GetEnd().Format("15:04"))
 				case a.sched:
-					fmt.Fprintf(f, "    SCHEDULED: <%s-%s>\n", event.GetStart().Format("2006-01-02 Mon 15:04"), event.GetEnd().Format("15:04"))
+					fmt.Fprintf(f, "SCHEDULED: <%s-%s>\n", event.GetStart().Format("2006-01-02 Mon 15:04"), event.GetEnd().Format("15:04"))
 				default:
 				}
 				// Print drawer contents
